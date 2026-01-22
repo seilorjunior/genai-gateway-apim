@@ -3,10 +3,6 @@ node_modules
 .env
 
 # Bicep build artifacts
-*.json
-!package.json
-!package-lock.json
-!main.parameters.json
-!abbreviations.json
-!devcontainer.json
-!azure.yaml
+infra/**/*.json
+!infra/main.parameters.json
+!infra/abbreviations.json
