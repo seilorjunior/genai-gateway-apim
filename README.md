@@ -113,6 +113,8 @@ The preceding command removes all provisoned resources. The `--purge` hard delet
 |Frontend     | a frontend consisting of a `index.html` and `app.js` | [Link](./src/web/)        |
 |Backend     | A backend written in Node.js and Express framework | [Link](./src/api/)        |
 |Bicep     | Bicep files containing the needed information to deploy resources and configure them as needed        | [Link](./infra) |
+|**Google Gemini Quick Start** | **Quick guide for deploying with Google Gemini** | **[Link](./QUICKSTART_GEMINI.md)** |
+|**Google Gemini Guide** | **Comprehensive guide for Gemini integration** | **[Link](./GEMINI_GUIDE.md)** |
 
 ## Demo
 
