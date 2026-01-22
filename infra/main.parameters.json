@@ -22,6 +22,12 @@
     },
     "apimLocation": {
       "value": "${AZURE_APIM_LOCATION=koreacentral}"
+    },
+    "enableGemini": {
+      "value": "${ENABLE_GEMINI=false}"
+    },
+    "geminiApiKey": {
+      "value": "${GEMINI_API_KEY=}"
     }
   }
 }

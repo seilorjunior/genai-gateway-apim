@@ -225,3 +225,67 @@ We've already hinted in places how authentication works in APIM, but let's dive 
 
 - Create a product and expose the API/s. TODO
 - Create a subscription on said product TODO
+
+## Google Gemini Integration
+
+This project now supports integration with Google's Gemini API using OpenAI-compatible endpoints. This allows you to use Gemini models alongside Azure OpenAI through the same API Management gateway.
+
+### Why Gemini with APIM?
+
+- **Unified Gateway**: Manage multiple AI providers (Azure OpenAI, Google Gemini) through a single endpoint
+- **Cost Management**: Apply rate limiting, quotas, and monitoring across all AI services
+- **Security**: Hide API keys from clients and apply consistent security policies
+- **Load Balancing**: Distribute traffic across multiple AI providers
+- **Observability**: Track usage, costs, and performance metrics in one place
+
+### How Gemini Integration Works
+
+Unlike Azure OpenAI which uses managed identity authentication, Google Gemini uses API key authentication:
+
+1. **Backend Configuration**: A backend is created pointing to `https://generativelanguage.googleapis.com/v1beta/openai`
+2. **Secure API Key Storage**: The Gemini API key is stored as a named value (secret) in APIM
+3. **Policy Application**: An inbound policy adds the API key as a Bearer token to all requests
+4. **OpenAI Compatibility**: Gemini's OpenAI-compatible endpoint means existing OpenAI SDKs work with minimal changes
+
+### Gemini Policy Example
+
+```xml
+<policies>
+  <inbound>
+    <set-backend-service backend-id="gemini-backend" />
+    <set-header name="Authorization" exists-action="override">
+      <value>@("Bearer " + "{{gemini-api-key}}")</value>
+    </set-header>
+    <rate-limit-by-key calls="60" renewal-period="60" 
+                       counter-key="@(context.Subscription.Id)" />
+  </inbound>
+</policies>
+```
+
+### Making Requests to Gemini
+
+Once deployed with Gemini enabled, you can make requests using the OpenAI SDK:
+
+```javascript
+const response = await fetch('https://<apim-name>.azure-api.net/gemini-api/gemini/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'api-key': '<your-apim-subscription-key>'
+  },
+  body: JSON.stringify({
+    model: 'gemini-2.0-flash',
+    messages: [
+      { role: 'system', content: 'You are a helpful assistant' },
+      { role: 'user', content: 'Hello!' }
+    ]
+  })
+});
+```
+
+### Resources
+
+- [Microsoft Learn: Import OpenAI-Compatible Google Gemini API](https://learn.microsoft.com/en-us/azure/api-management/openai-compatible-google-gemini-api)
+- [Google AI: Gemini OpenAI Compatibility](https://ai.google.dev/gemini-api/docs/openai)
+- [Azure APIM: Language Model API Import](https://learn.microsoft.com/en-us/azure/api-management/openai-compatible-llm-api)
+

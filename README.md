@@ -1,6 +1,6 @@
-# Azure API Management (APIM) - Azure Open AI Sample
+# Azure API Management (APIM) - Azure Open AI & Google Gemini Sample
 
-This sample project demonstrates how to use Azure API Management and Azure OpenAI to create a simple chatbot.
+This sample project demonstrates how to use Azure API Management with Azure OpenAI and optionally Google Gemini to create a simple chatbot. The project showcases how to integrate multiple AI providers through a unified API gateway.
 
 ## Quick Start
 
@@ -28,6 +28,30 @@ You'll be asked to select:
 - An Azure subscription.
 - An Azure location.
 - An `apimLocation`. Enter a value of `koreacentral`. The new API Management SKUv2 tier is used in this demo which is supported in the [following regions](https://learn.microsoft.com/azure/api-management/v2-service-tiers-overview#supported-regions).
+
+### 1.1 (Optional) Enable Google Gemini Integration
+
+To enable Google Gemini API alongside Azure OpenAI:
+
+1. **Get your Gemini API Key:**
+   - Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - Create or sign in to your account
+   - Generate an API key
+
+2. **Set environment variables before running `azd up`:**
+   ```bash
+   azd env set ENABLE_GEMINI true
+   azd env set GEMINI_API_KEY "your-gemini-api-key-here"
+   ```
+
+3. **Deploy with Gemini enabled:**
+   ```bash
+   azd up
+   ```
+
+The Gemini API will be available at: `https://<your-apim>.azure-api.net/gemini-api/gemini/`
+
+**Note:** Google Gemini uses OpenAI-compatible endpoints, allowing you to use the same client SDKs with minimal changes. See the [Microsoft Learn article](https://learn.microsoft.com/en-us/azure/api-management/openai-compatible-google-gemini-api) for more details.
 
 ### Inspect environment variables
 

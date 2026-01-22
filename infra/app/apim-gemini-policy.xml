@@ -1,0 +1,34 @@
+<policies>
+  <inbound>
+    <base />
+    <!-- Set the backend to Gemini -->
+    <set-backend-service id="apim-generated-policy" backend-id="gemini-backend" />
+    
+    <!-- Set the Authorization header with the Gemini API key -->
+    <set-header name="Authorization" exists-action="override">
+      <value>@("Bearer " + "{{gemini-api-key}}")</value>
+    </set-header>
+    
+    <!-- Remove APIM subscription key header as Gemini uses its own auth -->
+    <set-header name="api-key" exists-action="delete" />
+    
+    <!-- Optional: Add rate limiting for Gemini API -->
+    <rate-limit-by-key calls="60" renewal-period="60" counter-key="@(context.Subscription.Id)" />
+    
+    <!-- Optional: Emit metrics for monitoring -->
+    <azure-openai-emit-token-metric namespace="geminidemometrics">
+      <dimension name="Subscription ID" />
+      <dimension name="Client IP" value="@(context.Request.IpAddress)" />
+      <dimension name="Model" value="gemini" />
+    </azure-openai-emit-token-metric>
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

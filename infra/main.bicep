@@ -32,6 +32,16 @@ param productDescription string = 'A product with AI APIs'
 
 param apimName string = 'APIM8'
 
+@description('Enable Google Gemini API integration')
+param enableGemini bool = false
+
+@description('Google Gemini API Key (required if enableGemini is true)')
+@secure()
+param geminiApiKey string = ''
+
+@description('Gemini API Name')
+param geminiApiName string = 'gemini-api'
+
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
@@ -134,6 +144,22 @@ module api 'app/apim-api.bicep' = {
   }
 }
 
+// Optional: Google Gemini API integration
+module geminiApi 'app/apim-gemini.bicep' = if (enableGemini) {
+  name: 'gemini-api'
+  scope: resourceGroup
+  params: {
+    name: apim.outputs.apimServiceName
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    apiName: geminiApiName
+    productName: productName
+    geminiApiKey: geminiApiKey
+  }
+  dependsOn: [
+    api // Ensure the product is created first
+  ]
+}
+
 // Monitor application with Azure Monitor
 module monitoring 'core/monitor/monitoring.bicep' = {
   name: 'monitoring'
@@ -188,3 +214,8 @@ output API_VERSION string = openAiApiVersion
 output APIM_ENDPOINT string = 'https://${apim.outputs.apimServiceName}.azure-api.net'
 output API_SUFFIX string = api.outputs.apiSuffix
 output SUBSCRIPTION_KEY string = api.outputs.subscriptionKey
+
+// Gemini-specific outputs (only available if Gemini is enabled)
+output GEMINI_API_SUFFIX string = enableGemini ? geminiApi.outputs.apiSuffix : ''
+output GEMINI_ENABLED bool = enableGemini
+
